@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import  jwt from "jsonwebtoken"
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -55,6 +56,8 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password)
 }
 
+
+// this method create OTP or verification code
 userSchema.methods.generateVerificationCode = function () {
     function generateRandomFiveDigitNumber() {
         // math.random generate value in point format i.e 0.1, 0.6, 0.3..
@@ -70,6 +73,14 @@ userSchema.methods.generateVerificationCode = function () {
 
 
     return verificationCode;
+}
+
+
+userSchema.methods.generateToken = async function () {
+    // sign() method generate token string
+    return await jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
+        expiresIn: process.env.JWT_EXPIRE,
+    })
 }
 
 
